@@ -31,8 +31,13 @@ patterns = {
 
 results = {}
 for key, pattern in patterns.items():
-    match = re.search(pattern, logs)
-    results[key] = match.group(1) if match else None
+    matches = re.findall(pattern, logs)
+    if matches:
+        last_value = matches[-1]
+        results[key] = last_value
+    else:
+        results[key] = None  # or handle missing values as needed
+
 
 # Save as JSON
 with open(output_json, "w") as out_f:
