@@ -5,6 +5,10 @@ This project is still under developement, kindly raise issues if you run into an
 # LLM Benchmarking
 This project is to create a benchmark software to run on a loacal machine to benchmark the performance of a 3 LLM's  Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally or to infer over cloud.
 
+# System Requirements
+
+This is yet to be filled
+
 # Setup
 This project setup requires installing [Ollama](https://ollama.com/) a free software to easily run LLM's Locally
 
@@ -22,11 +26,23 @@ conda create -n your-env-name python=3.11
 Once env is activated run the following:
 ```python
 pip install -r requirements.txt
-python main.py
+python main.py --model modelName
+```
+Currently its supports only models included below:
+llama 3.1 - 8b (4-5 GiB)
+Gemma 2 - 2b (1 - 2 GiB)
+Qwen  2.5 - 7b (4 - 5 GiB)
+
+If you want to test any other model supported by ollama:
+First pull the weights:
+```bash
+ollama pull modelName
 ```
 
-If there are no errors you should get something like:
-```text
-data is in json file and logs are in ollama_debug.log
+then, try:
+```bash
+python main.py --model modelName
 ```
+
+
 
