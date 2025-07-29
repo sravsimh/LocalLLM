@@ -17,7 +17,6 @@ To check if ollama is installed run:
 ollama --version
 ```
 
-
 Once ollama is installed, then clone this repository and create a virtual environment using [conda](https://www.anaconda.com/docs/getting-started/miniconda/main) 
 ```bash
 conda create -n your-env-name python=3.11
@@ -28,12 +27,12 @@ Once env is activated run the following:
 pip install -r requirements.txt
 python main.py --model modelName
 ```
-Currently its supports only models included below:
-llama 3.1 - 8b (4-5 GiB)
-Gemma 2 - 2b (1 - 2 GiB)
+Currently its supports only models included below:<br>
+llama 3.1 - 8b (4-5 GiB)<br>
+Gemma 2 - 2b (1 - 2 GiB)<br>
 Qwen  2.5 - 7b (4 - 5 GiB)
 
-If you want to test any other model supported by ollama:
+If you want to test any other model supported by ollama,<br>
 First pull the weights:
 ```bash
 ollama pull modelName
