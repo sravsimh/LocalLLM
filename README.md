@@ -29,7 +29,7 @@ python main.py --model modelName
 ```
 Currently its supports only models included below:<br>
 llama 3.1 - 8b (4-5 GiB)<br>
-Gemma 2 - 2b (1 - 2 GiB)<br>
+Gemma - 2b (1 - 2 GiB)<br>
 Qwen  2.5 - 7b (4 - 5 GiB)
 
 If you want to test any other model supported by ollama,<br>
