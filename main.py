@@ -4,7 +4,7 @@ import argparse
 import shutil
 
 
-# Set environment variable
+CONFIG_FILE = "ollama_setup_complete.json"
 
 # this enables debug logging for Ollama (disable this(set to 0) if you dont want your gpu/cpu logs)
 os.environ["OLLAMA_DEBUG"] = "1"
@@ -48,6 +48,10 @@ def run_benchmark(model):
             exit(1)
 
 
+def setup_already_done():
+    return os.path.isfile(CONFIG_FILE)
+
+
 def main():
     # stopping the ollama server if any started from the app or cli
     exsisting = subprocess.run(
@@ -57,6 +61,7 @@ def main():
         stderr=subprocess.PIPE,
         text=True
     )
+
     if exsisting.stdout:
         subprocess.run(["powershell", "-Command",
                         "Stop-Process -Name 'ollama' -Force"])
@@ -67,6 +72,13 @@ def main():
                         help="Model name to benchmark (llama3.1, gemma2, qwen2.5)")
 
     args = parser.parse_args()
+
+    if setup_already_done():
+        print(" Ollama setup already completed. Skipping setup.")
+        return
+
+    else:
+        subprocess.run(["python", "get_specs.py"])
 
     run_benchmark(args.model)
     subprocess.run(["powershell", "-Command",

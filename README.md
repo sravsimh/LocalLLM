@@ -28,9 +28,14 @@ pip install -r requirements.txt
 python main.py --model modelName
 ```
 Currently its supports only models included below:<br>
-llama 3.1 - 8b (4-5 GiB)<br>
-Gemma - 2b (1 - 2 GiB)<br>
-Qwen  2.5 - 7b (4 - 5 GiB)
+<br>
+gemma:2b: Gemma 2B (No GPU)<br>
+gemma:7b: Gemma 7B (GPU)<br>
+llama3.1:8b: LLaMA 3.1 8B (GPU)<br>
+qwen2.5:0.5b: Qwen 2.5 0.5B (No GPU)<br>
+qwen2.5:1.5b: Qwen 2.5 1.5B (No GPU)<br>
+qwen2.5:3b: Qwen 2.5 3B (No GPU)<br>
+qwen2.5:7b: Qwen 2.5 7B (GPU)<br>
 
 If you want to test any other model supported by ollama,<br>
 First pull the weights:

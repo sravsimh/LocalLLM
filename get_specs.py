@@ -1,3 +1,4 @@
+from glob import glob
 import subprocess
 import shutil
 import platform
@@ -8,7 +9,10 @@ import os
 import questionary
 import signal
 
+from sqlalchemy import Null
+
 snake_process = None
+models_selected = []
 CONFIG_FILE = "ollama_setup_complete.json"
 
 MODELS = {
@@ -51,7 +55,7 @@ def get_system_info():
             "GPU Memory (Free GB)": round(gpu.memoryFree / 1024, 2)
         })
     else:
-        info["GPU"] = "No GPU found"
+        info["GPU"] = None
 
     return info
 
@@ -128,10 +132,9 @@ def pull_models(models):
     play_game = questionary.confirm(
         "Do you want to play Snake while models are downloading?").ask()
 
-    if play_game:
-        run_snake_game()
-
     try:
+        if play_game:
+            run_snake_game()
         for model in models:
             print(f"\nPulling model: {model} ...")
             subprocess.run(["ollama", "pull", model])
@@ -142,8 +145,10 @@ def pull_models(models):
 
 
 def save_setup_complete():
+    info = get_system_info()
+    info["models"] = models_selected
     with open(CONFIG_FILE, "w") as f:
-        json.dump({"setup_complete": True}, f)
+        json.dump({"setup_complete": True, "info": info}, f)
 
 
 def setup_already_done():
@@ -151,6 +156,7 @@ def setup_already_done():
 
 
 def main():
+    global models_selected
     if setup_already_done():
         print(" Ollama setup already completed. Skipping setup.")
         return
@@ -162,6 +168,7 @@ def main():
     print_system_info()
 
     selected_models = select_models()
+    models_selected = selected_models
     if not selected_models:
         print(" No models selected. Exiting.")
         return
