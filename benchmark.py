@@ -7,6 +7,7 @@ import csv
 import requests
 import psutil
 
+
 avg_eval_time = 0
 avg_prompt_eval_duration = 0
 avg_total_time = 0
@@ -18,32 +19,38 @@ OLLAMA_LOG = "ollama_debug.log"
 
 
 def stop_ollama_server():
+
     for proc in psutil.process_iter(['pid', 'name']):
         try:
             if 'ollama' in proc.info['name'].lower():
                 proc.terminate()
                 proc.wait(timeout=5)
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
+        except Exception as e:
+            print("Error stopping ollama:", e)
+            exit(1)
 
 
 def start_ollama():
+    print("starting server")
     cmd_serve = ["ollama", "serve"]
     with open(OLLAMA_LOG, "w", encoding="utf-8") as log_file:
-        PORT = 11434
+        if os.name == "posix":
+            pass
+        else:
+            PORT = 11434
 
-        for conn in psutil.net_connections(kind='inet'):
-            if conn.laddr.port == PORT:
-                pid = conn.pid
-                try:
-                    proc = psutil.Process(pid)
+            for conn in psutil.net_connections(kind='inet'):
+                if conn.laddr.port == PORT:
+                    pid = conn.pid
+                    try:
+                        proc = psutil.Process(pid)
 
-                    proc.terminate()  # Send SIGTERM
-                    proc.wait(timeout=5)  # Wait for process to exit
-                except Exception as e:
-                    print(e)
+                        proc.terminate()  # Send SIGTERM
+                        proc.wait(timeout=5)  # Wait for process to exit
+                    except Exception as e:
+                        print(e)
 
-                break
+                    break
         try:
             process = subprocess.Popen(
                 cmd_serve,
@@ -51,19 +58,19 @@ def start_ollama():
                 stderr=subprocess.STDOUT,
                 env=os.environ
             )
+
         except Exception as e:
             print(f"Error starting Ollama server: {e}")
             exit(1)
 
 
 def load_model(model):
-    print(f"Pulling model {model}...")
+    print(f"loading model {model}...")
     headers = {
         "Content-Type": "application/json"
     }
-    response = requests.post(
-        "http://localhost:11434/api/generate", headers=headers, json={"model": model})
-    print(response.status_code)
+    requests.post("http://127.0.0.1:11434/api/generate",
+                  headers=headers, json={"model": model})
 
 
 def unload_model(model):
@@ -71,23 +78,25 @@ def unload_model(model):
     headers = {
         "Content-Type": "application/json"
     }
-    response = requests.post("http://localhost:11434/api/generate", headers=headers,
-                             json={"model": model, "keep_alive": 0})
-    print(response.status_code, response.text)
+    requests.post("http://127.0.0.1:11434/api/generate",
+                  headers=headers, json={"model": model, "keep_alive": 0})
 
 
-def run_and_store_final_response(model, prompt, i, url="http://localhost:11434/api/generate"):
+def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/api/generate"):
     global avg_load_time, avg_total_time, avg_eval_time, avg_latency, avg_prompt_eval_duration, avg_tmp
     cmd_log = ["python", "log_extractor.py"]
     try:
 
-        start_ollama()
+        if not os.name == "posix":
+            start_ollama()
+            time.sleep(5)
         load_model(model)
 
         # Prepare the payload
         payload = {
             "model": model,
-            "prompt": prompt
+            "prompt": prompt,
+            "keep_alive": 0,
         }
 
         headers = {
@@ -99,8 +108,10 @@ def run_and_store_final_response(model, prompt, i, url="http://localhost:11434/a
         response = requests.post(url, headers=headers,
                                  json=payload, stream=False)
         end_time = time.time()
+        print(f"benchmarking model with {i+1} st/nd/rd promt")
         unload_model(model)
-        stop_ollama_server()
+        if not os.name == "posix":
+            stop_ollama_server()
         if os.environ.get("OLLAMA_DEBUG") == "1":
             try:
                 subprocess.run(cmd_log)
@@ -196,6 +207,9 @@ def write_metrics_to_csv(model_id, metrics, csv_file):
 
 
 def main():
+    if os.name == "posix":
+        start_ollama()
+
     parser = argparse.ArgumentParser(description="Run benchmark with model")
     parser.add_argument("--model", required=True,
                         help="Model name to benchmark (llama3.1:8b, gemma2:2b, qwen2.5:7b)")
@@ -206,7 +220,6 @@ def main():
         "what is 12165551231321512232321*1527132612836871263/23354351321354854313+546842165465132184320"
     ]
     for i, p in enumerate(prompts):
-        print(i)
         run_and_store_final_response(args.model, p, i)
 
     metrics = {

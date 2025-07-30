@@ -1,6 +1,11 @@
 ## Note
 This project is still under developement, kindly raise issues if you run into anything.
 
+For linux and unix please use:
+```bash
+sudo python main.py
+```
+
 # LLM Benchmarking
 This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.
 
@@ -17,7 +22,7 @@ VRAM - 2GB or Higher<br>
 GPU - 2GB or Higher(for larger models)<br>
 Disk Space - 5 - 15 GiB (Higer for larger models)<br>
 
-To Check system requirements of any model visit [ApXML](https://apxml.com/models), in the Quantizatio field please select INT4/Ollama
+To Check system requirements of any model visit [ApXML](https://apxml.com/models), in the Quantization field please select INT4 / Ollama
 
 >**Note**
 While selecting the models please select only recommended models for better performance

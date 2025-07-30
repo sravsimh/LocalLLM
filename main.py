@@ -14,16 +14,6 @@ sys_info = {}
 OLLAMA_LOG = "ollama_debug.log"
 
 
-def stop_ollama_server():
-    for proc in psutil.process_iter(['pid', 'name']):
-        try:
-            if 'ollama' in proc.info['name'].lower():
-                proc.terminate()
-                proc.wait(timeout=5)
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
-
-
 def run_benchmark(model):
     cmd_benchmark = ["python", "benchmark.py", "--model", f"{model}"]
 
@@ -56,7 +46,12 @@ def clean_log():
 
 def main():
     global sys_info
-    stop_ollama_server()
+    if os.path.exists("Avg_benchmark_results.csv"):
+        print("clearing exsisting values to run again")
+        os.remove("stats.json")
+        os.remove("Detailed_benchmark.json")
+        os.remove("Benchmark_results.csv")
+        os.remove("Avg_benchmark_results.csv")
 
     clean_log()
 
@@ -94,7 +89,6 @@ def main():
             os.remove("stats.json")
             exit(1)
 
-    stop_ollama_server()
     print("please check the CSV and Detailed_benchmark.json file for benchmarks")
 
     re_run = questionary.confirm(
@@ -102,8 +96,9 @@ def main():
 
     if re_run:
         os.remove("stats.json")
-        os.remove("benchmark_results.csv")
         os.remove("Detailed_benchmark.json")
+        os.remove("Benchmark_results.csv")
+        os.remove("Avg_benchmark_results.csv")
         main()
 
 
