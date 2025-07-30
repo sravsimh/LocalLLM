@@ -39,9 +39,9 @@ Now clone this repository by running:<br>
 ```bash
 git clone https://github.com/sravsimh/LocalLLM.git
 ```
-Once ollama is installed and you cloned this repository, create a virtual environment using [conda](https://www.anaconda.com/docs/getting-started/miniconda/main) 
+Now, create virtual environment using [conda](https://www.anaconda.com/docs/getting-started/miniconda/main) 
 ```bash
-conda create -n your-env-name python=3.11
+conda create -n envs-name python=3.11
 ```
 
 Once env is activated run the following:
@@ -80,15 +80,15 @@ Based on this we can decide if its beneficial to run locally.
 
 Refer to below table for referance:
 
-| Model (size)             | Acceptable TPM | Good TPM     | Excellent TPM |
-| ------------------------ | -------------- | ------------ | ------------- |
-| **Small (1B–3B)**        | 3,000–6,000    | 6,000–10,000 | >10,000       |
-| **Medium (7B)**          | 1,500–3,000    | 3,000–5,000  | >5,000        |
-| **Large (13B)**          | 800–2,000      | 2,000–3,500  | >3,500        |
-| **Very Large (30B–65B)** | 200–1,000      | 1,000–2,000  | >2,000        |
+| Model-(size of parameters)| Minimum TPM    | Good   TPM   | Excellent TPM |
+| ------------------------  | -------------- | ------------ | ------------- |
+| **small (1B–3B)**         | 3,000–6,000    | 6,000–10,000 | >10,000       |
+| **medium (7B)**           | 1,500–3,000    | 3,000–5,000  | >5,000        |
+| **large (13B)**           | 800–2,000      | 2,000–3,500  | >3,500        |
 
 
 
-<p align="center">Made with ❤️ by <strong>Sravsimh</strong></p>
+
+<p align="center">made with ❤️ by --<strong>sravsimh</strong>--</p>
 
 
