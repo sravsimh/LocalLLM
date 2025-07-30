@@ -1,11 +1,6 @@
 ## Note
 This project is still under developement, kindly raise issues if you run into anything.
 
-For linux and unix please use:
-```bash
-sudo python main.py
-```
-
 # LLM Benchmarking
 This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.
 
