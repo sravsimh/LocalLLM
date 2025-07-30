@@ -131,6 +131,8 @@ def pull_models(models):
         for model in models:
             print(f"\nPulling model: {model} ...")
             subprocess.run(["ollama", "pull", model])
+        print("pulling a default small model")
+        subprocess.run(["ollama", "pull", "smollm2:135m"])
     finally:
         if play_game:
             print("\nStopping Snake game...")
@@ -189,6 +191,7 @@ def main():
     }
 
     selected_models = select_models()
+
     models_selected = selected_models
     if not selected_models:
         print(" No models selected. Exiting.")

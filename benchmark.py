@@ -35,7 +35,19 @@ def start_ollama():
     cmd_serve = ["ollama", "serve"]
     with open(OLLAMA_LOG, "w", encoding="utf-8") as log_file:
         if os.name == "posix":
-            pass
+            # Prepare the payload
+            print("running a different model to remove ollama from memory")
+            payload = {
+                "model": "smollm2:135m",
+                "prompt": "heyloooo",
+                "keep_alive": 0,
+            }
+
+            headers = {
+                "Content-Type": "application/json"
+            }
+            response = requests.post(
+                "http://127.0.0.1:11434/api/generate", headers=headers, json=payload, stream=False)
         else:
             PORT = 11434
 
@@ -87,9 +99,7 @@ def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/a
 
     try:
 
-        if not os.name == "posix":
-            start_ollama()
-            time.sleep(5)
+        start_ollama()
         load_model(model)
 
         # Prepare the payload
@@ -152,6 +162,9 @@ def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/a
         tpm = (total_tokens / prompt_eval_duration + eval_duration) * \
             60 if eval_duration > 0 else 0
         latency = end_time - start_time
+        if (latency < 0):
+            print(end_time, start_time, "latency is -ve")
+            exit(1)
 
         metrics = {
             "prompt-id": i,
@@ -202,8 +215,6 @@ def write_metrics_to_csv(model_id, metrics, csv_file):
 
 
 def main():
-    if os.name == "posix":
-        start_ollama()
 
     parser = argparse.ArgumentParser(description="Run benchmark with model")
     parser.add_argument("--model", required=True,
