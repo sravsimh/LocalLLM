@@ -14,6 +14,18 @@ sys_info = {}
 OLLAMA_LOG = "ollama_debug.log"
 
 
+def get_installed_ollama_models():
+    result = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
+    models = []
+    if result.returncode == 0:
+        lines = result.stdout.strip().split('\n')[1:]  # Skip header
+        for line in lines:
+            parts = line.split()
+            if parts:
+                models.append(parts[0])
+    return models
+
+
 def run_benchmark(model):
     cmd_benchmark = ["python", "benchmark.py", "--model", f"{model}"]
 
@@ -23,7 +35,7 @@ def run_benchmark(model):
 
             if process2.returncode != 0:
                 print(
-                    "Error running benchmark script. Check the model name (llama3.1:8b, gemma2:2b, qwen2.5:7b)")
+                    "Error running benchmark script. Check the model name")
 
                 exit(1)
             else:
@@ -70,17 +82,18 @@ def main():
     args = parser.parse_args()
 
     if (args.model):
-        if os.path.exists("stats.json"):
-            if (args.model in sys_info['info']['models']):
-                run_benchmark(args.model)
-            else:
-                print(
-                    f"download model to run benchmarks: ollama pull {args.model}")
-                exit(1)
-        else:
+        installed_models = get_installed_ollama_models()
+
+        if (args.model not in installed_models):
             print(
-                f"download model to run benchmarks: ollama pull {args.model}")
-            exit(1)
+                f"model not downloaded running ollama pull {args.model}")
+            try:
+                subprocess.run(["ollama", "pull", args.model])
+            except Exception as e:
+                print(f"Error downloading {args.model}:", e)
+                return
+        run_benchmark(args.model)
+
     else:
         if os.path.exists("stats.json"):
             with open("stats.json", "r") as f:

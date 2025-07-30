@@ -87,6 +87,13 @@ Refer to below table for referance:
 | **large (13B)**           | 800–2,000      | 2,000–3,500  | >3,500        |
 
 
+# Extension
+If you have a good hardware with GPU > 16 GB you can try the 16 bit models which have higher precision(accurate answers), Make sure you have atleast 20GiB of storage
+```bash
+python main.py --model qwen2.5:1.5b-instruct-fp16
+python main.py --model qwen2.5:3b-instruct-fp16
+python main.py --model gemma:2b-instruct-fp16
+```
 
 
 <p align="center">made with ❤️ by --<strong>sravsimh</strong>--</p>
