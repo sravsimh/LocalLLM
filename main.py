@@ -46,12 +46,21 @@ def clean_log():
 
 def main():
     global sys_info
-    if os.path.exists("Avg_benchmark_results.csv"):
-        print("clearing exsisting values to run again")
-        os.remove("stats.json")
-        os.remove("Detailed_benchmark.json")
-        os.remove("Benchmark_results.csv")
-        os.remove("Avg_benchmark_results.csv")
+
+    files_to_delete = [
+        "stats.json",
+        "benchmark_results.csv",
+        "Avg_benchmark_results.csv"
+    ]
+
+    for file in files_to_delete:
+        if os.path.exists(file):
+            try:
+                os.remove(file)
+                print(f"Deleted: {file}")
+            except Exception as e:
+                print(f"Failed to delete {file}: {e}")
+                exit(1)
 
     clean_log()
 

@@ -65,6 +65,15 @@ then, try:
 ```bash
 python main.py --model modelName
 ```
+# Results
+To view results, there are 4 files:
+>Avg_benchmark_results.csv for AVG of 3 prompt Benchmarks
+>benchmark_results.csv for benchmarks of each run
+>stats.json for your pc specifications
+>ollama_debug.log for loggs of the server(suggested for developers)
+
+Based on these things we can
+
 
 <p align="center">Made with ❤️ by <strong>Sravsimh</strong></p>
 

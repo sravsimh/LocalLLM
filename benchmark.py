@@ -84,7 +84,7 @@ def unload_model(model):
 
 def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/api/generate"):
     global avg_load_time, avg_total_time, avg_eval_time, avg_latency, avg_prompt_eval_duration, avg_tmp
-    cmd_log = ["python", "log_extractor.py"]
+
     try:
 
         if not os.name == "posix":
@@ -112,12 +112,6 @@ def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/a
         unload_model(model)
         if not os.name == "posix":
             stop_ollama_server()
-        if os.environ.get("OLLAMA_DEBUG") == "1":
-            try:
-                subprocess.run(cmd_log)
-            except Exception as e:
-                print(f"Error running log_extractor.py: {e}")
-                exit(1)
         if not response.ok:
 
             if (response.status_code) == 404:
@@ -155,7 +149,8 @@ def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/a
         prompt_count = last_json['prompt_eval_count']
         eval_count = last_json['eval_count']
         total_tokens = prompt_count + eval_count
-        tpm = total_tokens / eval_duration if eval_duration > 0 else 0
+        tpm = (total_tokens / prompt_eval_duration + eval_duration) * \
+            60 if eval_duration > 0 else 0
         latency = end_time - start_time
 
         metrics = {
