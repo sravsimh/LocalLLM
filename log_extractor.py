@@ -1,19 +1,26 @@
 import re
 import json
+import os
+import sys
 
-log_path = "ollama_debug.log"
-output_json = "llama_benchmark.json"
+log_path = os.path.join(os.getcwd(), "ollama_debug.log")
+output_json = os.path.join(os.getcwd(), "Detailed_benchmark.json")
 
-# Load log
+# Ensure the log file exists
+if not os.path.isfile(log_path):
+    print(f"Log file not found: {log_path}")
+    sys.exit(1)
+
+# Load log content
 with open(log_path, "r", encoding="utf-8") as f:
     logs = f.read()
 
-# Patterns to extract add any if you want to monitor more
+# Regex patterns to extract from logs
 patterns = {
-    "vram": r"runner\.vram=\"([\d\.]+ GiB)\"",  # gives vram usage
-    "model_size": r"runner\.size=\"([\d\.]+ GiB)\"",  # gives model size
-    "devices": r"runner\.devices=([^\s]+)",  # gives devices used
-    # gives inference type
+    "model_name": r"registry\.ollama\.ai/library/([^\s]+)",
+    "vram": r"runner\.vram=\"([\d\.]+ GiB)\"",
+    "model_size": r"runner\.size=\"([\d\.]+ GiB)\"",
+    "devices": r"runner\.devices=([^\s]+)",
     "inference_type": r"runner\.inference=([^\s]+)",
     "context_size": r"runner\.num_ctx=(\d+)",
     "kv_buffer_cuda": r"CUDA0 KV buffer size =\s+([\d\.]+ MiB)",
@@ -25,22 +32,26 @@ patterns = {
     "graph_splits_bs512": r"graph splits = (\d+) \(with bs=512\)",
     "graph_splits_bs1": r"graph splits = \d+ \(with bs=512\), (\d+) \(with bs=1\)",
     "model_path": r"runner\.model=([^\s]+)",
-    "startup_time": r"llama runner started in ([\d\.]+ seconds)",
-    "completion_time": r"\|\s+(\d+m\d+s)\s+\|\s+127.0.0.1\s+\|\s+POST\s+\"/api/generate\""
+    "startup_time": r"ollama runner started in ([\d\.]+ seconds)",
+    "completion_time": r"\|\s+(\d+m\d+s)\s+\|\s+127\.0\.0\.1\s+\|\s+POST\s+\"/api/generate\""
+
 }
 
+# Extract latest value per pattern
 results = {}
 for key, pattern in patterns.items():
     matches = re.findall(pattern, logs)
-    if matches:
-        last_value = matches[-1]
-        results[key] = last_value
-    else:
-        results[key] = None  # or handle missing values as needed
+    results[key] = matches[-1] if matches else None
 
+if os.path.exists(output_json):
+    with open(output_json, "r", encoding="utf-8") as f:
+        data = json.load(f)
+else:
+    data = []
 
-# Save as JSON
-with open(output_json, "w") as out_f:
-    json.dump(results, out_f, indent=4)
+# Append the new result
+data.append(results)
 
-print("Extracted metrics saved to", output_json)
+# Save the updated list back to the file
+with open(output_json, "w", encoding="utf-8") as out_f:
+    json.dump(data, out_f, indent=4)

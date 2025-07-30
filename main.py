@@ -1,27 +1,51 @@
 import subprocess
 import os
-import argparse
-import shutil
-
+import questionary
+import psutil
+import json
 
 CONFIG_FILE = "ollama_setup_complete.json"
 
-# this enables debug logging for Ollama (disable this(set to 0) if you dont want your gpu/cpu logs)
+# Enable debug logging for Ollama (disable this by setting to "0")
 os.environ["OLLAMA_DEBUG"] = "1"
+sys_info = {}
+
+OLLAMA_LOG = "ollama_debug.log"
+
+
+def stop_ollama_server():
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            if 'ollama' in proc.info['name'].lower():
+                proc.terminate()
+                proc.wait(timeout=5)
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
 
 
 def run_benchmark(model):
+    cmd_serve = ["ollama", "serve"]
+    cmd_benchmark = ["python", "benchmark.py", "--model", f"{model}"]
+    cmd_log = ["python", "log_extractor.py"]
 
-    # Define the command to run Ollama
-    cmd = ["ollama", "serve"]
-    cmd2 = ["python", "benchmark.py", "--model", f"{model}"]
-    cmd3 = ["python", "log_extractor.py"]
+    with open(OLLAMA_LOG, "w", encoding="utf-8") as log_file:
+        PORT = 11434
 
-    with open("ollama_debug.log", "w", encoding="utf-8") as log_file:
-        # Start Ollama server
+        for conn in psutil.net_connections(kind='inet'):
+            if conn.laddr.port == PORT:
+                pid = conn.pid
+                try:
+                    proc = psutil.Process(pid)
+
+                    proc.terminate()  # Send SIGTERM
+                    proc.wait(timeout=5)  # Wait for process to exit
+                except Exception as e:
+                    print(e)
+
+                break
         try:
             process = subprocess.Popen(
-                cmd,
+                cmd_serve,
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
                 env=os.environ
@@ -30,21 +54,26 @@ def run_benchmark(model):
             print(f"Error starting Ollama server: {e}")
             exit(1)
 
-        # Running benchmark.py script
         try:
-            process2 = subprocess.run(cmd2)
+            process2 = subprocess.run(cmd_benchmark)
+
             if process2.returncode != 0:
                 print(
-                    "Error running benchmark script check the model name---(llama3.1:8b,gemma2:2b,qwen2.5:7b)")
+                    "Error running benchmark script. Check the model name (llama3.1:8b, gemma2:2b, qwen2.5:7b)")
+
                 exit(1)
-            try:
-                if os.environ["OLLAMA_DEBUG"] == "1" and process2.returncode == 0:
-                    subprocess.run(cmd3)
-            except Exception as e:
-                print(f"Error running log_extractor.py: {e}")
-                exit(1)
+            else:
+                print(f"Benchmark completed for model: {model}")
+            if os.environ.get("OLLAMA_DEBUG") == "1":
+                try:
+                    subprocess.run(cmd_log)
+                except Exception as e:
+                    print(f"Error running log_extractor.py: {e}")
+
+                    exit(1)
         except Exception as e:
             print(f"Error running benchmark script: {e}")
+
             exit(1)
 
 
@@ -52,37 +81,45 @@ def setup_already_done():
     return os.path.isfile(CONFIG_FILE)
 
 
+def clean_log():
+    if os.path.isfile(OLLAMA_LOG):
+        os.remove(OLLAMA_LOG)
+
+
 def main():
-    # stopping the ollama server if any started from the app or cli
-    exsisting = subprocess.run(
-        ["tasklist", "|", "findstr", "ollama"],
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    global sys_info
+    stop_ollama_server()
 
-    if exsisting.stdout:
-        subprocess.run(["powershell", "-Command",
-                        "Stop-Process -Name 'ollama' -Force"])
-    shutil.rmtree("ollama_debug.log", ignore_errors=True)
+    clean_log()
 
-    parser = argparse.ArgumentParser(description="Run benchmark with model")
-    parser.add_argument("--model", required=True,
-                        help="Model name to benchmark (llama3.1, gemma2, qwen2.5)")
-
-    args = parser.parse_args()
-
-    if setup_already_done():
-        print(" Ollama setup already completed. Skipping setup.")
-        return
-
+    if os.path.exists("stats.json"):
+        with open("stats.json", "r") as f:
+            sys_info = json.load(f)
     else:
         subprocess.run(["python", "get_specs.py"])
+        with open("stats.json", "r") as f:
+            sys_info = json.load(f)
 
-    run_benchmark(args.model)
-    subprocess.run(["powershell", "-Command",
-                    "Stop-Process -Name 'ollama' -Force"])
+    if len(sys_info['info']['models']) > 0:
+        for model in sys_info["info"]["models"]:
+            print(f"Running benchmark for model: {model}")
+            run_benchmark(model)
+    else:
+        print("No models found in stats.json. Please run get_specs.py first.")
+        os.remove("stats.json")
+        exit(1)
+
+    stop_ollama_server()
+    print("please check the CSV and Detailed_benchmark.json file for benchmarks")
+
+    re_run = questionary.confirm(
+        "do you want to re-run or test other models").ask()
+
+    if re_run:
+        os.remove("stats.json")
+        os.remove("benchmark_results.csv")
+        os.remove("Detailed_benchmark.json")
+        main()
 
 
 if __name__ == "__main__":

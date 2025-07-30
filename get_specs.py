@@ -12,19 +12,11 @@ import signal
 from sqlalchemy import Null
 
 snake_process = None
+MODELS = []
 models_selected = []
-CONFIG_FILE = "ollama_setup_complete.json"
 
-MODELS = {
-    "gemma:2b": "Gemma 2B (No GPU)",
-    "gemma:7b": "Gemma 7B (GPU)",
-    "llama3.1:8b": "LLaMA 3.1 8B (GPU)",
-    "qwen2.5:0.5b": "Qwen 2.5 0.5B (No GPU)",
-    "qwen2.5:1.5b": "Qwen 2.5 1.5B (No GPU)",
-    "qwen2.5:3b": "Qwen 2.5 3B (No GPU)",
-    "qwen2.5:7b": "Qwen 2.5 7B (GPU)",
 
-}
+CONFIG_FILE = "stats.json"
 
 
 def is_ollama_installed():
@@ -144,11 +136,26 @@ def pull_models(models):
             stop_snake_game()
 
 
+def stats_type():
+    info = get_system_info()
+    if info["GPU"] is not None:
+        if info["GPU Memory (Free GB)"] >= 2:
+            return 1
+        else:
+            return 0
+    else:
+        if info["Memory (GB)"] >= 16:
+            return 1
+        else:
+            return 0
+
+
 def save_setup_complete():
     info = get_system_info()
     info["models"] = models_selected
+    info["sys_type"] = "low" if stats_type() == 0 else "medium"
     with open(CONFIG_FILE, "w") as f:
-        json.dump({"setup_complete": True, "info": info}, f)
+        json.dump({"info": info}, f)
 
 
 def setup_already_done():
@@ -157,6 +164,8 @@ def setup_already_done():
 
 def main():
     global models_selected
+    global MODELS
+
     if setup_already_done():
         print(" Ollama setup already completed. Skipping setup.")
         return
@@ -166,11 +175,23 @@ def main():
         return
 
     print_system_info()
+    sys_type = stats_type()
+    MODELS = {
+        "gemma:2b": f"gemma:2b recommended",
+        "gemma:7b": f'gemma:7b {"recommended" if sys_type == 1 else ""}',
+        "llama3.1:8b": f'llama3.1:8b {"recommended" if sys_type == 1 else ""}',
+        "qwen2.5:0.5b": f"qwen2.5:0.5b recommended",
+        "qwen2.5:1.5b": f"qwen2.5:1.5b recommended",
+        "qwen2.5:3b": f"qwen2.5:3b recommended",
+        "qwen2.5:7b": f'qwen2.5:7b {"recommended" if sys_type == 1 else ""}',
+
+    }
 
     selected_models = select_models()
     models_selected = selected_models
     if not selected_models:
         print(" No models selected. Exiting.")
+        save_setup_complete()
         return
 
     pull_models(selected_models)
