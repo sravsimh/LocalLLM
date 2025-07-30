@@ -25,36 +25,9 @@ def stop_ollama_server():
 
 
 def run_benchmark(model):
-    cmd_serve = ["ollama", "serve"]
     cmd_benchmark = ["python", "benchmark.py", "--model", f"{model}"]
-    cmd_log = ["python", "log_extractor.py"]
 
     with open(OLLAMA_LOG, "w", encoding="utf-8") as log_file:
-        PORT = 11434
-
-        for conn in psutil.net_connections(kind='inet'):
-            if conn.laddr.port == PORT:
-                pid = conn.pid
-                try:
-                    proc = psutil.Process(pid)
-
-                    proc.terminate()  # Send SIGTERM
-                    proc.wait(timeout=5)  # Wait for process to exit
-                except Exception as e:
-                    print(e)
-
-                break
-        try:
-            process = subprocess.Popen(
-                cmd_serve,
-                stdout=log_file,
-                stderr=subprocess.STDOUT,
-                env=os.environ
-            )
-        except Exception as e:
-            print(f"Error starting Ollama server: {e}")
-            exit(1)
-
         try:
             process2 = subprocess.run(cmd_benchmark)
 
@@ -65,13 +38,7 @@ def run_benchmark(model):
                 exit(1)
             else:
                 print(f"Benchmark completed for model: {model}")
-            if os.environ.get("OLLAMA_DEBUG") == "1":
-                try:
-                    subprocess.run(cmd_log)
-                except Exception as e:
-                    print(f"Error running log_extractor.py: {e}")
 
-                    exit(1)
         except Exception as e:
             print(f"Error running benchmark script: {e}")
 

@@ -1,9 +1,12 @@
 ## Note
-
 This project is still under developement, kindly raise issues if you run into anything.
 
 # LLM Benchmarking
-This project is to create a benchmark software to run on a loacal machine to benchmark the performance of a 3 LLM's  Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally or to infer over cloud.
+This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.
+
+This repository is using Ollama library for local LLM setup since it is user-friendly and easy to setup
+
+>**Note** this repository only tests 4 Bit Quantized models from Ollama libraby
 
 # System Requirements
 
@@ -13,6 +16,8 @@ RAM - 6GB or Higher<br>
 VRAM - 2GB or Higher<br>
 GPU - 2GB or Higher(for larger models)<br>
 Disk Space - 5 - 15 GiB (Higer for larger models)<br>
+
+To Check system requirements of any model visit [ApXML](https://apxml.com/models), in the Quantizatio field please select INT4/Ollama
 
 >**Note**
 While selecting the models please select only recommended models for better performance
@@ -26,7 +31,11 @@ To check if ollama is installed run:
 ollama --version
 ```
 
-Once ollama is installed, then clone this repository and create a virtual environment using [conda](https://www.anaconda.com/docs/getting-started/miniconda/main) 
+Now clone this repository by running:<br>
+```bash
+git clone https://github.com/sravsimh/LocalLLM.git
+```
+Once ollama is installed and you cloned this repository, create a virtual environment using [conda](https://www.anaconda.com/docs/getting-started/miniconda/main) 
 ```bash
 conda create -n your-env-name python=3.11
 ```
@@ -38,13 +47,13 @@ python main.py
 ```
 Currently its supports only models included below:<br>
 <br>
-gemma:2b: Gemma 2B (No GPU)<br>
-gemma:7b: Gemma 7B (GPU)<br>
-llama3.1:8b: LLaMA 3.1 8B (GPU)<br>
-qwen2.5:0.5b: Qwen 2.5 0.5B (No GPU)<br>
-qwen2.5:1.5b: Qwen 2.5 1.5B (No GPU)<br>
-qwen2.5:3b: Qwen 2.5 3B (No GPU)<br>
-qwen2.5:7b: Qwen 2.5 7B (GPU)<br>
+Gemma 2B <br>
+Gemma 7B <br>
+LLaMA 3.1 8B <br>
+Qwen 2.5 0.5B <br>
+Qwen 2.5 1.5B <br>
+Qwen 2.5 3B <br>
+Qwen 2.5 7B <br>
 
 If you want to test any other model supported by ollama,<br>
 First pull the weights:
