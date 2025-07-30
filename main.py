@@ -97,7 +97,7 @@ def main():
     if re_run:
         os.remove("stats.json")
         os.remove("Detailed_benchmark.json")
-        os.remove("Benchmark_results.csv")
+        os.remove("benchmark_results.csv")
         os.remove("Avg_benchmark_results.csv")
         main()
 
