@@ -3,6 +3,7 @@ import os
 import questionary
 import psutil
 import json
+import argparse
 
 CONFIG_FILE = "ollama_setup_complete.json"
 
@@ -92,22 +93,39 @@ def main():
 
     clean_log()
 
-    if os.path.exists("stats.json"):
-        with open("stats.json", "r") as f:
-            sys_info = json.load(f)
-    else:
-        subprocess.run(["python", "get_specs.py"])
-        with open("stats.json", "r") as f:
-            sys_info = json.load(f)
+    parser = argparse.ArgumentParser(description="Run benchmark with model")
+    parser.add_argument("--model", required=False,
+                        help="Model name to benchmark (llama3.1:8b, gemma2:2b, qwen2.5:7b)")
+    args = parser.parse_args()
 
-    if len(sys_info['info']['models']) > 0:
-        for model in sys_info["info"]["models"]:
-            print(f"Running benchmark for model: {model}")
-            run_benchmark(model)
+    if (args.model):
+        if os.path.exists("stats.json"):
+            if (args.model in sys_info['info']['models']):
+                run_benchmark(args.model)
+            else:
+                print(
+                    f"download model to run benchmarks: ollama pull {args.model}")
+                exit(1)
+        else:
+            print(
+                f"download model to run benchmarks: ollama pull {args.model}")
+            exit(1)
     else:
-        print("No models found in stats.json. Please run get_specs.py first.")
-        os.remove("stats.json")
-        exit(1)
+        if os.path.exists("stats.json"):
+            with open("stats.json", "r") as f:
+                sys_info = json.load(f)
+        else:
+            subprocess.run(["python", "get_specs.py"])
+            with open("stats.json", "r") as f:
+                sys_info = json.load(f)
+        if len(sys_info['info']['models']) > 0:
+            for model in sys_info["info"]["models"]:
+                print(f"Running benchmark for model: {model}")
+                run_benchmark(model)
+        else:
+            print("No models found in stats.json. Please run get_specs.py first.")
+            os.remove("stats.json")
+            exit(1)
 
     stop_ollama_server()
     print("please check the CSV and Detailed_benchmark.json file for benchmarks")

@@ -7,7 +7,16 @@ This project is to create a benchmark software to run on a loacal machine to ben
 
 # System Requirements
 
-This is yet to be filled
+The Minimum System Requirements are:<br>
+CPU - intel i5 or greater<br>
+RAM - 6GB or Higher<br>
+VRAM - 2GB or Higher<br>
+GPU - 2GB or Higher(for larger models)<br>
+Disk Space - 5 - 15 GiB (Higer for larger models)<br>
+
+>**Note**
+While selecting the models please select only recommended models for better performance
+
 
 # Setup
 This project setup requires installing [Ollama](https://ollama.com/) a free software to easily run LLM's Locally
@@ -25,7 +34,7 @@ conda create -n your-env-name python=3.11
 Once env is activated run the following:
 ```python
 pip install -r requirements.txt
-python main.py --model modelName
+python main.py
 ```
 Currently its supports only models included below:<br>
 <br>
@@ -48,5 +57,6 @@ then, try:
 python main.py --model modelName
 ```
 
+<p align="center">Made with ❤️ by <strong>Sravsimh</strong></p>
 
 
