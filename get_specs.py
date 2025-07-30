@@ -1,4 +1,3 @@
-from glob import glob
 import subprocess
 import shutil
 import platform
@@ -7,9 +6,6 @@ import GPUtil
 import json
 import os
 import questionary
-import signal
-
-from sqlalchemy import Null
 
 snake_process = None
 MODELS = []
@@ -131,8 +127,9 @@ def pull_models(models):
         for model in models:
             print(f"\nPulling model: {model} ...")
             subprocess.run(["ollama", "pull", model])
-        print("pulling a default small model")
-        subprocess.run(["ollama", "pull", "smollm2:135m"])
+        if os.name == "posix":
+            print("pulling a default small model")
+            subprocess.run(["ollama", "pull", "smollm2:135m"])
     finally:
         if play_game:
             print("\nStopping Snake game...")

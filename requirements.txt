@@ -3,5 +3,4 @@ psutil
 GPUtil
 questionary
 argparse
-sqlalchemy
 requests

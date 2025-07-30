@@ -2,15 +2,15 @@
 This project is still under developement, kindly raise issues if you run into anything.
 
 # Issues
-When running in linux or unix the server cant be stopped with psutil and requires sudo, to overcome this I have come up with a solution:
->running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the model from Memory and ram resulting in accurate benchmark timings.
+When running in linux or unix the server can't be stopped with psutil and requires sudo, to overcome this I have come up with a solution:
+>running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the model from Memory and RAM resulting in accurate benchmark timings.
 
 # LLM Benchmarking
 This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.
 
 This repository is using Ollama library for local LLM setup since it is user-friendly and easy to setup
 
->**Note** this repository only tests 4 Bit Quantized models from Ollama libraby
+>**Note** this repository only tests 4 Bit Quantized models from Ollama library
 
 # System Requirements
 
@@ -19,7 +19,7 @@ CPU - intel i5 or greater<br>
 RAM - 6GB or Higher<br>
 VRAM - 2GB or Higher<br>
 GPU - 2GB or Higher(for larger models)<br>
-Disk Space - 5 - 15 GiB (Higer for larger models)<br>
+Disk Space - 5 - 15 GiB (Higher for larger models)<br>
 
 To Check system requirements of any model visit [ApXML](https://apxml.com/models), in the Quantization field please select INT4 / Ollama
 
@@ -49,7 +49,7 @@ Once env is activated run the following:
 pip install -r requirements.txt
 python main.py
 ```
-Currently its supports only models included below:<br>
+Currently it supports only models included below:<br>
 <br>
 Gemma 2B <br>
 Gemma 7B <br>
@@ -74,9 +74,11 @@ To view results, there are 4 files:
 >Avg_benchmark_results.csv for AVG of 3 prompt Benchmarks<br>
 >benchmark_results.csv for benchmarks of each run<br>
 >stats.json for your pc specifications<br>
->ollama_debug.log for loggs of the server(suggested for developers)<br>
+>ollama_debug.log for logs of the server(recommended for developers)<br>
 
-Based on these things we can decide if its beneficial to run locally.
+Based on this we can decide if its beneficial to run locally.
+
+Refer to below table for referance:
 
 | Model (size)             | Acceptable TPM | Good TPM     | Excellent TPM |
 | ------------------------ | -------------- | ------------ | ------------- |
