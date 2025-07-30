@@ -2,7 +2,7 @@
 This project is still under developement, kindly raise issues if you run into anything.
 
 # Issues
-When running in linux or unix the server cant be stopped with psutil and requires sudo, to overcome this i have come up with a solution:
+When running in linux or unix the server cant be stopped with psutil and requires sudo, to overcome this I have come up with a solution:
 >running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the model from Memory and ram resulting in accurate benchmark timings.
 
 # LLM Benchmarking
