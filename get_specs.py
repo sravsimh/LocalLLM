@@ -80,6 +80,7 @@ def run_snake_game():
         is_wsl = "microsoft" in platform.uname().release.lower()
 
         if system == "Windows" or is_wsl:
+            subprocess.run(["pip", "install", "windows_curses"])
             snake_process = subprocess.Popen([
                 "cmd.exe", "/c", "start", "cmd", "/k", "ruben-snake-cmd"
             ])
