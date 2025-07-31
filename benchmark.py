@@ -41,6 +41,7 @@ def start_ollama():
                 "model": "smollm2:135m",
                 "prompt": "heyloooo",
                 "keep_alive": 0,
+                "streaming": False,
             }
 
             headers = {
@@ -107,6 +108,7 @@ def run_and_store_final_response(model, prompt, i, url="http://127.0.0.1:11434/a
             "model": model,
             "prompt": prompt,
             "keep_alive": 0,
+            "streaming": False,
         }
 
         headers = {

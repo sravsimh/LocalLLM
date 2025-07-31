@@ -14,10 +14,6 @@ When running in linux or unix the server can't be stopped with psutil and requir
 >running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the main model from Memory and RAM resulting in accurate benchmark timings.
 
 
-
-
-
-
 # LLM Benchmarking
 This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.
 
@@ -83,11 +79,29 @@ then, try:
 python main.py --model modelName
 ```
 # Results
+The main focus of this repository is around TPM(tokens per minute) and Latency of the model,
+
+The calculations for both are as follows:
+>**TPM(Throughput)**:<br> 
+**(Prompt_tokens + Generated_tokens)/(Promt_eval_duration + Generation_eval_duration)** server up time and model load time are not included in this calculation
+
+>**Latency**:<br>
+Latency is the time taken for the model to load and generate the response(streaming is set to False for accurate results) **Promt_eval_dutation + Generation_eval_duration + model_load_time**
+
 To view results, there are 4 files:
->Avg_benchmark_results.csv for AVG of 3 prompt Benchmarks<br>
->benchmark_results.csv for benchmarks of each run<br>
->stats.json for your pc specifications<br>
->ollama_debug.log for logs of the server(recommended for developers)<br>
+>**Avg_benchmark_results.csv** for AVG of 3 prompt Benchmarks<br>
+>**benchmark_results.csv** for benchmarks of each run<br>
+>**stats.json** for your pc specifications<br>
+>**ollama_debug.log** for logs of the server(recommended for developers)<br>
+
+| **Model**        | **TTFT (Latency)**                 | **Notes**                                                               |
+| ---------------- | ---------------------------------- | ----------------------------------------------------------------------- |
+| **LLaMA 3.1 8B** | **0.18 – 0.55 seconds**            | Good responsiveness on high-end consumer GPUs (e.g., 3090/4090).        |
+| **Gemma 2B**     | **< 0.10 seconds**                 | Near-instant on H100/H200-class GPUs; excellent for real-time response. |
+| **Qwen2.5 7B**   | **\~0.12 – 0.25 seconds** *(est.)* | Optimized for low TTFT via streaming; may vary by provider or backend.  |
+
+
+compare this latency with your latency to find out if its benificial to run LLM locally,
 
 Based on this we can decide if its beneficial to run locally.
 
@@ -101,13 +115,12 @@ Refer to below table for referance:
 
 
 # Extension
-If you have a good hardware with GPU > 16 GB you can try the 16 bit models which have higher precision(accurate answers), Make sure you have atleast 20GiB of storage
+If you have a good hardware with GPU > 16 GB you can try the 16 bit models which have higher precision(I/O value precision), Make sure you have atleast 20GiB of storage
 ```bash
 python main.py --model qwen2.5:1.5b-instruct-fp16
 python main.py --model qwen2.5:3b-instruct-fp16
 python main.py --model gemma:2b-instruct-fp16
 ```
-
 
 <p align="center">made with ❤️ by --<strong>sravsimh</strong>--</p>
 
