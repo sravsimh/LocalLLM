@@ -1,9 +1,22 @@
 ## Note
 This project is still under developement, kindly raise issues if you run into anything.
 
-# Issues
+# Common Issues
+
+If you get a request Error or Error in benchmarks script these might be the possible reasons:
+>You are running multiple ollama instances so quit ollama from taskbar<br>
+>Or, You configured your Ollama to run on a different port so either switch back to 11434 or in benchmar.py change the port 11434 to your port.<br>
+>If you are running with --model then either the model is not pulled or you are spelling the modelName wrong
+
+If you run into any other issues in benchmark.py please raise issues with details.
+
 When running in linux or unix the server can't be stopped with psutil and requires sudo, to overcome this I have come up with a solution:
->running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the model from Memory and RAM resulting in accurate benchmark timings.
+>running a small model between two benchmarking runs ([smollm2:135m](https://ollama.com/library/smollm2)) this removes the main model from Memory and RAM resulting in accurate benchmark timings.
+
+
+
+
+
 
 # LLM Benchmarking
 This Repository aims to create a software to run on a loacal machine to benchmark the performance of LLM's like Llama 3.1 8B, Qwen 2.5, Gemma 2B and determine if it is beneficial to run locally.

@@ -3,3 +3,4 @@
 *.csv
 testing.py
 __pycache__/
+*.prof
